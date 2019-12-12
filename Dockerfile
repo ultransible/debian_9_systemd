@@ -6,10 +6,14 @@ ENV DEBIAN_FRONTEND noninteractive
 # Install dependencies.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-       sudo systemd python \
+       sudo systemd \
+       build-essential libffi-dev libssl-dev \
+       python-apt \
+       python-pip python-dev python-setuptools python-wheel vim \
     && rm -rf /var/lib/apt/lists/* \
     && rm -Rf /usr/share/doc && rm -Rf /usr/share/man \
-    && apt-get clean
+    && apt-get clean \
+    && apt-get update
 
 RUN rm -f /lib/systemd/system/multi-user.target.wants/* \
     /etc/systemd/system/*.wants/* \
@@ -19,6 +23,5 @@ RUN rm -f /lib/systemd/system/multi-user.target.wants/* \
     /lib/systemd/system/sysinit.target.wants/systemd-tmpfiles-setup* \
     /lib/systemd/system/systemd-update-utmp*
 
-COPY initctl_faker .
-RUN chmod +x initctl_faker && rm -fr /sbin/initctl && ln -s /initctl_faker /sbin/initctl
-ENTRYPOINT ["/lib/systemd/systemd"]
+CMD ["/lib/systemd/systemd"]
+STOPSIGNAL SIGRTMIN+3
